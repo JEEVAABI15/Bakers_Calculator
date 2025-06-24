@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { productsAPI } from '../services/api';
+import { productsAPI } from '../services/api.js';
 
 export function useProducts() {
   const [products, setProducts] = useState([]);
@@ -10,7 +10,13 @@ export function useProducts() {
   useEffect(() => {
     setLoading(true);
     productsAPI.getAll()
-      .then((data) => setProducts(data))
+      .then((data) => {
+        const normalizedProducts = data.map(p => ({
+          ...p,
+          id: p._id?.$oid || p._id || p.id
+        }));
+        setProducts(normalizedProducts);
+      })
       .catch((err) => setError(err.message || 'Failed to fetch products'))
       .finally(() => setLoading(false));
   }, []);
