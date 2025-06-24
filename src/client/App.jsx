@@ -8,6 +8,7 @@ import { BillingSystem } from './components/BillingSystem.jsx';
 import Login from './components/Login.jsx';
 import Signup from './components/Signup.jsx';
 import Profile from './components/Profile.jsx';
+import PrivateRoute from './components/PrivateRoute';
 
 function isAuthenticated() {
   return !!localStorage.getItem('authToken');
@@ -36,54 +37,33 @@ function App() {
             )
           }
         />
-        <Route
-          path="/dashboard"
-          element={
-            isAuthenticated() ? (
-              <Layout>
-                <Dashboard />
-              </Layout>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
-        <Route
-          path="/inventory"
-          element={
-            isAuthenticated() ? (
+        <Route element={<PrivateRoute />}>
+          <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
+          <Route
+            path="/inventory"
+            element={
               <Layout>
                 <InventoryManagement />
               </Layout>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
-        <Route
-          path="/products"
-          element={
-            isAuthenticated() ? (
+            }
+          />
+          <Route
+            path="/products"
+            element={
               <Layout>
                 <ProductManagement />
               </Layout>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
-        <Route
-          path="/billing"
-          element={
-            isAuthenticated() ? (
+            }
+          />
+          <Route
+            path="/billing"
+            element={
               <Layout>
                 <BillingSystem />
               </Layout>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
+            }
+          />
+        </Route>
         <Route
           path="/"
           element={<Navigate to={isAuthenticated() ? "/dashboard" : "/login"} replace />}

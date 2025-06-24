@@ -1,3 +1,26 @@
+# Project Structure (Updated June 2024)
+
+## Monorepo Layout
+
+- `src/client/` — React frontend (Vite, all components, hooks, services)
+- `src/server/` — Express backend (controllers, models, routes, middleware, server.js)
+
+## Scripts
+
+- `npm run dev` — Start frontend (Vite, src/client)
+- `npm run dev:backend` — Start backend (Nodemon, src/server/server.js)
+- `npm run build` — Build frontend for production
+- `npm run preview` — Preview frontend production build
+- `npm run start:backend` — Start backend in production mode
+- `npm run docker:build` — Build Docker images for frontend, backend, and MongoDB
+- `npm run docker:up` — Start all services with Docker Compose
+- `npm run docker:down` — Stop all Docker Compose services
+
+## Docker Compose
+
+- Runs frontend, backend, and MongoDB in separate containers
+- See `docker-compose.yml` for details
+
 # Billing System - MVC Architecture
 
 A modern billing and inventory management system built with Express.js, TypeScript, and MongoDB using the MVC (Model-View-Controller) pattern.
