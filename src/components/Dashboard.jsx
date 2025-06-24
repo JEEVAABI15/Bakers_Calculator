@@ -1,8 +1,8 @@
 import React from 'react';
 import { Package, ChefHat, Receipt, DollarSign, TrendingUp, Calendar } from 'lucide-react';
-import { useInventory } from '../hooks/useInventory';
-import { useProducts } from '../hooks/useProducts';
-import { useBilling } from '../hooks/useBilling';
+import { useInventory } from '../hooks/useInventory.js';
+import { useProducts } from '../hooks/useProducts.js';
+import { useBilling } from '../hooks/useBilling.js';
 
 export function Dashboard() {
   const { inventory } = useInventory();
@@ -45,7 +45,7 @@ export function Dashboard() {
     }
   ];
 
-  const getLowStockThreshold = (unit: string) => {
+  const getLowStockThreshold = (unit) => {
     return unit === 'pieces' ? 5 : 100;
   };
 
@@ -136,4 +136,4 @@ export function Dashboard() {
       </div>
     </div>
   );
-}
+} 
