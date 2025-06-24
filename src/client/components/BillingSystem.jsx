@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Plus, Trash2, Download, Calculator, User, Phone, MapPin } from 'lucide-react';
-import { useProducts } from '../hooks/useProducts';
-import { useBilling } from '../hooks/useBilling';
-import { BillItem, AdditionalCost } from '../types';
+import React, { useState, useEffect } from 'react';
+import { Plus, Trash2, Download, Calculator, User } from 'lucide-react';
+import { useProducts } from '../hooks/useProducts.js';
+import { useBilling } from '../hooks/useBilling.js';
 import jsPDF from 'jspdf';
+import { profileAPI } from '../services/api.js';
 
 export function BillingSystem() {
   const { products } = useProducts();
@@ -11,10 +11,27 @@ export function BillingSystem() {
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
-  const [billItems, setBillItems] = useState<BillItem[]>([]);
-  const [additionalCosts, setAdditionalCosts] = useState<AdditionalCost[]>([]);
+  const [billItems, setBillItems] = useState([]);
+  const [additionalCosts, setAdditionalCosts] = useState([]);
   const [discountPercentage, setDiscountPercentage] = useState(0);
   const [profitPercentage, setProfitPercentage] = useState(50); // Default 50% markup
+  const [bakery, setBakery] = useState({
+    bakeryName: '',
+    bakeryAddress: '',
+    bakeryPhone: '',
+    bakeryEmail: '',
+  });
+
+  useEffect(() => {
+    profileAPI.getProfile()
+      .then((data) => setBakery({
+        bakeryName: data.bakeryName || '',
+        bakeryAddress: data.bakeryAddress || '',
+        bakeryPhone: data.bakeryPhone || '',
+        bakeryEmail: data.bakeryEmail || '',
+      }))
+      .catch(() => {});
+  }, []);
 
   const subtotal = billItems.reduce((sum, item) => sum + item.totalAmount, 0);
   const additionalCostsTotal = additionalCosts.reduce((sum, cost) => sum + cost.amount, 0);
@@ -23,7 +40,6 @@ export function BillingSystem() {
   const totalCostPrice = billItems.reduce((sum, item) => sum + (item.costPrice * item.quantity), 0) + additionalCostsTotal;
   const profitAmount = totalAmount - totalCostPrice;
 
-  // Update selling prices when profit percentage changes
   React.useEffect(() => {
     setBillItems((prevItems) =>
       prevItems.map((item) => {
@@ -37,7 +53,7 @@ export function BillingSystem() {
     );
   }, [profitPercentage]);
 
-  const addBillItem = (productId: string) => {
+  const addBillItem = (productId) => {
     const product = products.find(p => p.id === productId);
     if (!product) return;
 
@@ -55,7 +71,7 @@ export function BillingSystem() {
           : item
       ));
     } else {
-      const newItem: BillItem = {
+      const newItem = {
         productId: product.id,
         productName: product.name,
         quantity: 1,
@@ -67,7 +83,7 @@ export function BillingSystem() {
     }
   };
 
-  const updateItemPrice = (productId: string, sellingPrice: number) => {
+  const updateItemPrice = (productId, sellingPrice) => {
     setBillItems(billItems.map(item =>
       item.productId === productId
         ? { 
@@ -79,7 +95,7 @@ export function BillingSystem() {
     ));
   };
 
-  const updateItemQuantity = (productId: string, quantity: number) => {
+  const updateItemQuantity = (productId, quantity) => {
     if (quantity <= 0) {
       setBillItems(billItems.filter(item => item.productId !== productId));
     } else {
@@ -95,12 +111,12 @@ export function BillingSystem() {
     }
   };
 
-  const removeItem = (productId: string) => {
+  const removeItem = (productId) => {
     setBillItems(billItems.filter(item => item.productId !== productId));
   };
 
   const addAdditionalCost = () => {
-    const newCost: AdditionalCost = {
+    const newCost = {
       id: Date.now().toString(),
       description: '',
       amount: 0,
@@ -108,13 +124,13 @@ export function BillingSystem() {
     setAdditionalCosts([...additionalCosts, newCost]);
   };
 
-  const updateAdditionalCost = (id: string, field: 'description' | 'amount', value: string | number) => {
+  const updateAdditionalCost = (id, field, value) => {
     setAdditionalCosts(additionalCosts.map(cost =>
       cost.id === id ? { ...cost, [field]: value } : cost
     ));
   };
 
-  const removeAdditionalCost = (id: string) => {
+  const removeAdditionalCost = (id) => {
     setAdditionalCosts(additionalCosts.filter(cost => cost.id !== id));
   };
 
@@ -139,7 +155,6 @@ export function BillingSystem() {
       profitPercentage, // Save profit percentage with bill
     });
 
-    // Reset form
     setCustomerName('');
     setCustomerPhone('');
     setCustomerAddress('');
@@ -159,26 +174,21 @@ export function BillingSystem() {
 
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
-    
-    // Header
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
     doc.text("BAKER'S INVOICE", pageWidth / 2, 25, { align: 'center' });
-    
-    // Business details (you can customize this)
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text('Your Bakery Name', 20, 40);
-    doc.text('Address Line 1, City, State - PIN', 20, 45);
-    doc.text('Phone: +91 XXXXX XXXXX | Email: your@email.com', 20, 50);
-    
-    // Bill details
+    doc.text(bakery.bakeryName || "Your Bakery Name", 20, 40);
+    doc.text(bakery.bakeryAddress || 'Address Line 1, City, State - PIN', 20, 45);
+    doc.text(
+      `Phone: ${bakery.bakeryPhone || '+91 XXXXX XXXXX'} | Email: ${bakery.bakeryEmail || 'your@email.com'}`,
+      20, 50
+    );
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.text(`Bill No: BILL-${Date.now()}`, 20, 65);
     doc.text(`Date: ${new Date().toLocaleDateString('en-IN')}`, 20, 72);
-    
-    // Customer details
     if (customerName || customerPhone || customerAddress) {
       doc.text('Bill To:', 20, 85);
       doc.setFont('helvetica', 'normal');
@@ -196,11 +206,7 @@ export function BillingSystem() {
         yPos += 7;
       }
     }
-    
-    // Items table
     let yPosition = customerName || customerPhone || customerAddress ? 115 : 85;
-    
-    // Table header
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.text('ITEM', 20, yPosition);
@@ -208,12 +214,8 @@ export function BillingSystem() {
     doc.text('RATE', 130, yPosition);
     doc.text('AMOUNT', 160, yPosition);
     yPosition += 5;
-    
-    // Draw line
     doc.line(20, yPosition, 190, yPosition);
     yPosition += 8;
-    
-    // Items
     doc.setFont('helvetica', 'normal');
     billItems.forEach((item) => {
       doc.text(item.productName, 20, yPosition);
@@ -222,8 +224,6 @@ export function BillingSystem() {
       doc.text(`₹${item.totalAmount.toFixed(2)}`, 160, yPosition);
       yPosition += 8;
     });
-    
-    // Additional costs
     if (additionalCosts.length > 0) {
       additionalCosts.forEach((cost) => {
         if (cost.description && cost.amount > 0) {
@@ -235,40 +235,30 @@ export function BillingSystem() {
         }
       });
     }
-    
-    // Totals section
     yPosition += 5;
     doc.line(20, yPosition, 190, yPosition);
     yPosition += 10;
-    
     doc.setFont('helvetica', 'normal');
     doc.text(`Subtotal:`, 130, yPosition);
     doc.text(`₹${subtotal.toFixed(2)}`, 160, yPosition);
     yPosition += 8;
-    
     if (additionalCostsTotal > 0) {
       doc.text(`Additional Costs:`, 130, yPosition);
       doc.text(`₹${additionalCostsTotal.toFixed(2)}`, 160, yPosition);
       yPosition += 8;
     }
-    
     if (discountPercentage > 0) {
       doc.text(`Discount (${discountPercentage}%):`, 130, yPosition);
       doc.text(`-₹${discountAmount.toFixed(2)}`, 160, yPosition);
       yPosition += 8;
     }
-    
-    // Total
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
     doc.text(`TOTAL:`, 130, yPosition);
     doc.text(`₹${totalAmount.toFixed(2)}`, 160, yPosition);
-    
-    // Footer
     doc.setFontSize(8);
     doc.setFont('helvetica', 'italic');
     doc.text('Thank you for your business!', pageWidth / 2, 280, { align: 'center' });
-    
     doc.save(`invoice-${Date.now()}.pdf`);
   };
 
@@ -559,4 +549,4 @@ export function BillingSystem() {
       </div>
     </div>
   );
-}
+} 

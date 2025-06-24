@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Edit3, Trash2, Save, X } from 'lucide-react';
-import { useInventory } from '../hooks/useInventory';
-import { InventoryItem } from '../types';
+import { useInventory } from '../hooks/useInventory.js';
 
 const UNIT_OPTIONS = [
   { value: 'grams', label: 'Grams (g)' },
@@ -18,22 +17,19 @@ export function InventoryManagement() {
   const [formData, setFormData] = useState({
     name: '',
     totalQuantity: '',
-    unit: 'grams' as const,
+    unit: 'grams',
     totalCost: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const totalQuantity = parseFloat(formData.totalQuantity);
     const totalCost = parseFloat(formData.totalCost);
-    
     if (!formData.name || totalQuantity <= 0 || totalCost <= 0) {
       alert('Please fill all fields with valid values');
       return;
     }
-
     const costPerUnit = totalCost / totalQuantity;
-    
     if (editingItem) {
       updateItem(editingItem.id, {
         name: formData.name,
@@ -52,12 +48,11 @@ export function InventoryManagement() {
         costPerUnit,
       });
     }
-
     setFormData({ name: '', totalQuantity: '', unit: 'grams', totalCost: '' });
     setShowAddForm(false);
   };
 
-  const handleEdit = (item: InventoryItem) => {
+  const handleEdit = (item) => {
     setEditingItem(item);
     setFormData({
       name: item.name,
@@ -74,7 +69,7 @@ export function InventoryManagement() {
     setEditingItem(null);
   };
 
-  const getUnitLabel = (unit: string) => {
+  const getUnitLabel = (unit) => {
     const unitOption = UNIT_OPTIONS.find(option => option.value === unit);
     return unitOption ? unitOption.label : unit;
   };
@@ -135,7 +130,7 @@ export function InventoryManagement() {
               </label>
               <select
                 value={formData.unit}
-                onChange={(e) => setFormData({ ...formData, unit: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 {UNIT_OPTIONS.map((option) => (
@@ -184,7 +179,7 @@ export function InventoryManagement() {
       <div className="grid gap-4">
         {inventory.length > 0 ? (
           inventory.map((item) => (
-            <div key={item.id} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
+            <div key={item._id} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">{item.name}</h3>
@@ -248,4 +243,4 @@ export function InventoryManagement() {
       </div>
     </div>
   );
-}
+} 

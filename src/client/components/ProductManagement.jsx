@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Edit3, Trash2, Save, X } from 'lucide-react';
-import { useProducts } from '../hooks/useProducts';
-import { useInventory } from '../hooks/useInventory';
-import { Product, ProductIngredient } from '../types';
+import { useProducts } from '../hooks/useProducts.js';
+import { useInventory } from '../hooks/useInventory.js';
 
 export function ProductManagement() {
   const { products, addProduct, deleteProduct } = useProducts();
@@ -12,53 +11,46 @@ export function ProductManagement() {
     name: '',
     weight: '',
   });
-  const [ingredients, setIngredients] = useState<ProductIngredient[]>([]);
+  const [ingredients, setIngredients] = useState([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    
     if (!formData.name || !formData.weight || ingredients.length === 0) {
       alert('Please fill all fields and add at least one ingredient');
       return;
     }
-
     const weight = parseFloat(formData.weight);
     if (weight <= 0) {
       alert('Weight must be greater than 0');
       return;
     }
-
     const totalCost = ingredients.reduce((sum, ing) => sum + ing.cost, 0);
-
     addProduct({
       name: formData.name,
       weight,
       ingredients,
       totalCost,
     });
-
     setFormData({ name: '', weight: '' });
     setIngredients([]);
     setShowAddForm(false);
   };
 
-  const addIngredient = (ingredientId: string, quantity: number) => {
-    const inventoryItem = inventory.find(item => item.id === ingredientId);
+  const addIngredient = (ingredientId, quantity) => {
+    const inventoryItem = inventory.find(item => item._id === ingredientId);
     if (!inventoryItem || quantity <= 0) return;
-
     const cost = inventoryItem.costPerUnit * quantity;
-    const newIngredient: ProductIngredient = {
+    const newIngredient = {
       ingredientId,
       ingredientName: inventoryItem.name,
       quantity,
       unit: inventoryItem.unit,
       cost,
     };
-
     setIngredients([...ingredients, newIngredient]);
   };
 
-  const removeIngredient = (index: number) => {
+  const removeIngredient = (index) => {
     setIngredients(ingredients.filter((_, i) => i !== index));
   };
 
@@ -68,8 +60,8 @@ export function ProductManagement() {
     setShowAddForm(false);
   };
 
-  const getUnitLabel = (unit: string) => {
-    const unitLabels: { [key: string]: string } = {
+  const getUnitLabel = (unit) => {
+    const unitLabels = {
       'grams': 'g',
       'pieces': 'pcs',
       'liters': 'L',
@@ -199,7 +191,7 @@ export function ProductManagement() {
       <div className="grid gap-4">
         {products.length > 0 ? (
           products.map((product) => (
-            <div key={product.id} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
+            <div key={product._id} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-xl font-semibold text-gray-900">{product.name}</h3>
@@ -213,7 +205,7 @@ export function ProductManagement() {
                   <button
                     onClick={() => {
                       if (confirm('Are you sure you want to delete this product?')) {
-                        deleteProduct(product.id);
+                        deleteProduct(product._id);
                       }
                     }}
                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
@@ -227,7 +219,7 @@ export function ProductManagement() {
                 <h4 className="font-medium text-gray-900 mb-2">Ingredients:</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {product.ingredients.map((ingredient, index) => (
-                    <div key={index} className="flex justify-between text-sm bg-gray-50 p-2 rounded">
+                    <div key={ingredient.ingredientId || index} className="flex justify-between text-sm bg-gray-50 p-2 rounded">
                       <span>{ingredient.ingredientName}</span>
                       <span>{ingredient.quantity} {getUnitLabel(ingredient.unit)} - ₹{ingredient.cost.toFixed(2)}</span>
                     </div>
@@ -258,10 +250,7 @@ export function ProductManagement() {
   );
 }
 
-function IngredientSelector({ inventory, onAddIngredient }: {
-  inventory: any[];
-  onAddIngredient: (id: string, quantity: number) => void;
-}) {
+function IngredientSelector({ inventory, onAddIngredient }) {
   const [selectedIngredient, setSelectedIngredient] = useState('');
   const [quantity, setQuantity] = useState('');
 
@@ -273,10 +262,10 @@ function IngredientSelector({ inventory, onAddIngredient }: {
     }
   };
 
-  const selectedItem = inventory.find(item => item.id === selectedIngredient);
+  const selectedItem = inventory.find(item => item._id === selectedIngredient);
 
-  const getUnitLabel = (unit: string) => {
-    const unitLabels: { [key: string]: string } = {
+  const getUnitLabel = (unit) => {
+    const unitLabels = {
       'grams': 'g',
       'pieces': 'pcs',
       'liters': 'L',
@@ -296,7 +285,7 @@ function IngredientSelector({ inventory, onAddIngredient }: {
       >
         <option value="">Select ingredient...</option>
         {inventory.map((item) => (
-          <option key={item.id} value={item.id}>
+          <option key={item._id} value={item._id}>
             {item.name} (₹{item.costPerUnit.toFixed(3)}/{getUnitLabel(item.unit)})
           </option>
         ))}
@@ -319,4 +308,4 @@ function IngredientSelector({ inventory, onAddIngredient }: {
       </button>
     </div>
   );
-}
+} 
