@@ -4,11 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "vite --config vite.config.ts --root src/client",
+    "build": "vite build --config vite.config.ts --root src/client",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "dev:backend": "nodemon src/server.js"
+    "preview": "vite preview --config vite.config.ts --root src/client",
+    "dev:backend": "nodemon src/server/server.js",
+    "start:backend": "node src/server/server.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
