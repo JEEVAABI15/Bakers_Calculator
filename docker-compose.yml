@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:6
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:/data/db
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/billing-system
+      - JWT_SECRET=your-secret-key
+      - PORT=3001
+    depends_on:
+      - mongo
+    ports:
+      - 3001:3001
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    depends_on:
+      - backend
+    ports:
+      - 4173:4173
+volumes:
+  mongo-data: 
