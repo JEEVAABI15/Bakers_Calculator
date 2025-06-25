@@ -12,7 +12,7 @@
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up",
     "docker:down": "docker-compose down",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
