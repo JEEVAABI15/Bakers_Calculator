@@ -64,7 +64,7 @@ export function ProductManagement() {
     const unitLabels = {
       'grams': 'g',
       'pieces': 'pcs',
-      'liters': 'L',
+      'ml': 'ml',
       'cups': 'cups',
       'tablespoons': 'tbsp',
       'teaspoons': 'tsp',
@@ -268,7 +268,7 @@ function IngredientSelector({ inventory, onAddIngredient }) {
     const unitLabels = {
       'grams': 'g',
       'pieces': 'pcs',
-      'liters': 'L',
+      'ml': 'ml',
       'cups': 'cups',
       'tablespoons': 'tbsp',
       'teaspoons': 'tsp',

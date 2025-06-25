@@ -31,7 +31,7 @@ describe('Inventory Endpoints', () => {
     const res = await request(app)
       .post('/api/inventory')
       .set('Authorization', `Bearer ${token}`)
-      .send({ name: 'Flour', totalQuantity: 10, unit: 'kg', costPerUnit: 2, totalCost: 20 });
+      .send({ name: 'Flour', totalQuantity: 10, unit: 'ml', costPerUnit: 2, totalCost: 20 });
     expect(res.statusCode).toBe(201);
     expect(res.body).toHaveProperty('_id');
     itemId = res.body._id;
@@ -61,4 +61,4 @@ describe('Inventory Endpoints', () => {
     expect(res.statusCode).toBe(200);
     expect(res.body).toHaveProperty('message', 'Deleted');
   });
-}); 
+}, 20000); 

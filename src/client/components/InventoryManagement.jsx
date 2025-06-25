@@ -5,7 +5,7 @@ import { useInventory } from '../hooks/useInventory.js';
 const UNIT_OPTIONS = [
   { value: 'grams', label: 'Grams (g)' },
   { value: 'pieces', label: 'Pieces (pcs)' },
-  { value: 'liters', label: 'Liters (L)' },
+  { value: 'ml', label: 'Milliliters (ml)' },
   { value: 'cups', label: 'Cups' },
   { value: 'tablespoons', label: 'Tablespoons (tbsp)' },
   { value: 'teaspoons', label: 'Teaspoons (tsp)' },
@@ -193,7 +193,7 @@ export function InventoryManagement() {
                       <p className="font-medium text-gray-900">₹{item.totalCost.toFixed(2)}</p>
                     </div>
                     <div>
-                      <p className="text-gray-600">Cost per {item.unit === 'pieces' ? 'Piece' : item.unit.charAt(0).toUpperCase() + item.unit.slice(1, -1)}</p>
+                      <p className="text-gray-600">Cost per {item.unit === 'pieces' ? 'Piece' : (item.unit === 'ml' ? 'Milliliter' : item.unit.charAt(0).toUpperCase() + item.unit.slice(1, -1))}</p>
                       <p className="font-medium text-gray-900">₹{item.costPerUnit.toFixed(3)}</p>
                     </div>
                     <div>
