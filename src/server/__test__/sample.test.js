@@ -1,17 +1,20 @@
-import request from 'supertest';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
+import request from 'supertest';
 import app from '../server.js'; // You may need to export your app from server.js
+
+let mongoServer;
 
 describe('User Registration', () => {
   beforeAll(async () => {
-    // Connect to a test database
-    await mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+    mongoServer = await MongoMemoryServer.create();
+    const uri = mongoServer.getUri();
+    await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
   });
 
   afterAll(async () => {
-    // Clean up database and close connection
-    await mongoose.connection.db.dropDatabase();
-    await mongoose.connection.close();
+    await mongoose.disconnect();
+    await mongoServer.stop();
   });
 
   it('should register a new user', async () => {
