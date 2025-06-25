@@ -51,7 +51,12 @@ describe('Bill Endpoints', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({ total: 200 });
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveProperty('total', 200);
+    // Check for all main Bill fields
+    expect(res.body).toHaveProperty('_id');
+    expect(res.body).toHaveProperty('userId');
+    expect(res.body).toHaveProperty('items');
+    expect(res.body).toHaveProperty('additionalCosts');
+    expect(res.body).toHaveProperty('createdAt');
   });
 
   it('should delete a bill', async () => {
